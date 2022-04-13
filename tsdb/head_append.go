@@ -633,6 +633,11 @@ func (s *memSeries) insert(t int64, v float64, chunkDiskMapper chunkDiskMapper) 
 		if chunkCreated || t > c.maxTime {
 			c.maxTime = t
 		}
+		if s.oooBlockRanges == nil {
+			s.oooBlockRanges = make(map[int64]struct{})
+		}
+		blockIdx := t / s.chunkRange
+		s.oooBlockRanges[blockIdx] = struct{}{}
 	}
 	return ok, chunkCreated, mmapRef
 }
@@ -786,6 +791,7 @@ func (s *memSeries) mmapCurrentOOOHeadChunk(chunkDiskMapper chunkDiskMapper) chu
 		minTime:    s.oooHeadChunk.minTime,
 		maxTime:    s.oooHeadChunk.maxTime,
 	})
+	s.oooHeadChunk = nil
 	return chunkRef
 }
 
