@@ -768,7 +768,15 @@ func TestOOOHeadChunkReader_Chunk(t *testing.T) {
 	}
 }
 
-func TestOOOHeadChunkReader_Chunk_ConsistentResponseDespiteOfHeadExpanding(t *testing.T) {
+// TestOOOHeadChunkReader_Chunk_ConsistentQueryResponseDespiteOfHeadExpanding tests
+// that if a query comes and performs a Series() call followed by a Chunks() call
+// the response is consistent with the data seen by Series() even if the OOO
+// head receives more samples before Chunks() is called.
+// An example:
+// - Response A comes from: Series() then Chunk()
+// - Response B comes from : Series(), in parallel new samples added to the head, then Chunk()
+// - A == B
+func TestOOOHeadChunkReader_Chunk_ConsistentQueryResponseDespiteOfHeadExpanding(t *testing.T) {
 	opts := DefaultOptions()
 	opts.OOOCapMin = 1
 	opts.OOOCapMax = 5
